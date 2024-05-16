@@ -9,10 +9,19 @@ import {
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 
 function createApolloClient() {
+  console.log(
+    "process.env.NEXT_PUBLIC_API_URL",
+    process.env.NEXT_PUBLIC_ENV_VARIABLE
+  );
+  const isServer = typeof window === "undefined";
+  const uri = isServer
+    ? process.env.PRIVATE_API_URL
+    : process.env.NEXT_PUBLIC_API_URL;
+
   return new ApolloClient({
-    ssrMode: typeof window === "undefined",
+    ssrMode: isServer,
     link: new HttpLink({
-      uri: "http://localhost:8080/query",
+      uri: uri,
       credentials: "same-origin",
     }),
     cache: new InMemoryCache(),
