@@ -32,7 +32,10 @@ pipeline {
               echo "Docker Hub user: $DOCKER_USER"
               echo "🔐 Writing Docker Hub credentials to ~/.docker/config.json..."
               mkdir -p ~/.docker
-              echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_USER:$DOCKER_PASS | base64)\"}}}" > ~/.docker/config.json
+              # 使用 shell 脚本中的变量替换生成合法 JSON 配置
+              DOCKER_AUTH=$(echo -n "$DOCKER_USER:$DOCKER_PASS" | base64)
+              echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > ~/.docker/config.json
+              cat ~/.docker/config.json
 
               echo "🔧 Building & pushing Docker image using BuildKit..."
               buildctl --addr $BUILDKIT_HOST build \\
@@ -55,7 +58,7 @@ pipeline {
         sshagent(credentials: ["${SSH_CREDS}"]) {
           sh '''
             echo "🚀 Deploying to EC2..."
-            ssh -o StrictHostKeyChecking=no $EC2_HOST << EOF
+            ssh -o StrictHostKeyChecking=no $EC2_HOST << 'EOF'
               docker pull $DOCKER_IMAGE
               docker stop next-app || true
               docker rm next-app || true
@@ -64,7 +67,7 @@ pipeline {
                 -e NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \\
                 -e PRIVATE_API_URL=$PRIVATE_API_URL \\
                 $DOCKER_IMAGE
-            EOF
+EOF
           '''
         }
       }
