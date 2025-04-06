@@ -1,9 +1,15 @@
 pipeline {
     agent {
       docker {
+<<<<<<< HEAD
         image 'docker:24.0.5-dind'
         args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
       }
+=======
+      image 'docker:24.0.5-cli'  // has Docker CLI but not daemon
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
+    }
+>>>>>>> 01329a9 (chore: 🤖 CCLF-003 Added Jenkins file)
     }
 
     /*
