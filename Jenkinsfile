@@ -30,7 +30,8 @@ pipeline {
       }
     }
 
-    stage('Build & Push with BuildKit') {
+
+    stage('Build & Push with Buildx') {
       steps {
         script {
           withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -38,21 +39,24 @@ pipeline {
               echo "Docker Hub user: $DOCKER_USER"
               echo "🔐 Writing Docker Hub credentials to ~/.docker/config.json..."
               mkdir -p ~/.docker
-              echo ">>> This is the NEW Jenkinsfile version! <<<"
               DOCKER_AUTH=$(echo -n "$DOCKER_USER:$DOCKER_PASS" | base64)
               echo '{"auths":{"https://index.docker.io/v1/":{"auth":"'"$DOCKER_AUTH"'"}}}' > ~/.docker/config.json
               cat ~/.docker/config.json
 
-              echo "🔧 Building & pushing Docker image using BuildKit..."
-              buildctl --addr $BUILDKIT_HOST build \\
-                --frontend dockerfile.v0 \\
-                --local context=. \\
-                --local dockerfile=. \\
-                --opt filename=Dockerfile \\
-                --opt build-arg:ENV_VARIABLE=$ENV_VARIABLE \\
-                --opt build-arg:NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \\
-                --opt build-arg:PRIVATE_API_URL=$PRIVATE_API_URL \\
-                --output type=registry,ref=$DOCKER_IMAGE,push=true
+              echo "🔧 Building & pushing Docker image using Buildx..."
+              # Create a new builder instance named "mybuilder" if it doesn't exist, or switch to it.
+              docker buildx create --name mybuilder --use || docker buildx use mybuilder
+
+              # Buildx automatically uses BuildKit under the hood and supports pushing images.
+              docker buildx build \
+                --platform linux/amd64 \
+                -f Dockerfile \
+                -t $DOCKER_IMAGE \
+                --build-arg ENV_VARIABLE=$ENV_VARIABLE \
+                --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+                --build-arg PRIVATE_API_URL=$PRIVATE_API_URL \
+                --push \
+                .
             '''
           }
         }
