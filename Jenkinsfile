@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+      docker {
+        image 'docker:24.0.5-dind'
+        args '--privilege'
+      }
+    }
 
     /*
      * Parameterize your pipeline for flexibility. This way, you can change
