@@ -84,8 +84,5 @@ pipeline {
         failure {
             echo "Deployment failed. Check the logs."
         }
-        always {
-            // Perform any cleanup you need here
-        }
     }
 }
