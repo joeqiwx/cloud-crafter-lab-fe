@@ -10,21 +10,18 @@ let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 
 function createApolloClient() {
   console.log(
-    "process.env.NEXT_PUBLIC_ENV_VARIABLE",
-    process.env.NEXT_PUBLIC_ENV_VARIABLE
+    "process.env.NEXT_PUBLIC_API_URL",
+    process.env.NEXT_PUBLIC_API_URL
   );
 
   console.log("process.env.PRIVATE_API_URL", process.env.PRIVATE_API_URL);
 
   const isServer = typeof window === "undefined";
-  const uri = isServer
-    ? process.env.PRIVATE_API_URL
-    : process.env.NEXT_PUBLIC_ENV_VARIABLE;
 
   return new ApolloClient({
     ssrMode: isServer,
     link: new HttpLink({
-      uri: uri,
+      uri: process.env.NEXT_PUBLIC_API_URL,
       credentials: "same-origin",
     }),
     cache: new InMemoryCache(),
