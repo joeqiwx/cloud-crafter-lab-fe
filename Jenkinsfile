@@ -29,6 +29,7 @@ pipeline {
         script {
           withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             sh '''
+              echo "Docker Hub user: $DOCKER_USER"'
               echo "🔐 Writing Docker Hub credentials to ~/.docker/config.json..."
               mkdir -p ~/.docker
               echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_USER:$DOCKER_PASS | base64)\"}}}" > ~/.docker/config.json
