@@ -40,7 +40,7 @@ pipeline {
               mkdir -p ~/.docker
               echo ">>> This is the NEW Jenkinsfile version! <<<"
               DOCKER_AUTH=$(echo -n "$DOCKER_USER:$DOCKER_PASS" | base64)
-              echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > ~/.docker/config.json
+              echo '{"auths":{"https://index.docker.io/v1/":{"auth":"'"$DOCKER_AUTH"'"}}}' > ~/.docker/config.json
               cat ~/.docker/config.json
 
               echo "🔧 Building & pushing Docker image using BuildKit..."
