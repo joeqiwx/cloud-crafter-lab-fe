@@ -28,6 +28,7 @@ pipeline {
       steps {
         script {
           withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+<<<<<<< HEAD
             sh '''
               echo "🔐 Writing Docker Hub credentials to ~/.docker/config.json..."
 
@@ -45,6 +46,25 @@ pipeline {
                 --opt build-arg:PRIVATE_API_URL=$PRIVATE_API_URL \
                 --output type=registry,ref=$DOCKER_IMAGE,push=true
             '''
+=======
+            sh """
+              echo "🔐 Writing Docker Hub credentials..."
+
+              mkdir -p ~/.docker
+              echo '{\\"auths\\":{\\"https://index.docker.io/v1/\\":{\\"auth\\": \\"'"\$(echo -n \$DOCKER_USER:\$DOCKER_PASS | base64)"'\\"}}}' > ~/.docker/config.json
+
+              echo "🔧 Building & pushing Docker image using BuildKit..."
+              buildctl --addr $BUILDKIT_HOST build \\
+                --frontend dockerfile.v0 \\
+                --local context=. \\
+                --local dockerfile=. \\
+                --opt filename=Dockerfile \\
+                --opt build-arg:ENV_VARIABLE=$ENV_VARIABLE \\
+                --opt build-arg:NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \\
+                --opt build-arg:PRIVATE_API_URL=$PRIVATE_API_URL \\
+                --output type=registry,ref=$DOCKER_IMAGE,push=true
+            """
+>>>>>>> 73db496 (chore: 🤖 CCLF-003 Added Jenkins file)
           }
         }
       }
