@@ -32,7 +32,7 @@ pipeline {
               echo "Docker Hub user: $DOCKER_USER"
               echo "🔐 Writing Docker Hub credentials to ~/.docker/config.json..."
               mkdir -p ~/.docker
-              # 使用 shell 脚本中的变量替换生成合法 JSON 配置
+              echo ">>> This is the NEW Jenkinsfile version! <<<"
               DOCKER_AUTH=$(echo -n "$DOCKER_USER:$DOCKER_PASS" | base64)
               echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > ~/.docker/config.json
               cat ~/.docker/config.json
