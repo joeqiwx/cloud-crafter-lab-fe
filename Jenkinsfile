@@ -24,6 +24,12 @@ pipeline {
       }
     }
 
+    stage('Check Jenkinsfile Content') {
+      steps {
+        sh 'cat Jenkinsfile'
+      }
+    }
+
     stage('Build & Push with BuildKit') {
       steps {
         script {
